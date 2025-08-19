@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UfoReportController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 // Homepage
@@ -14,7 +15,7 @@ Route::get('/dashboard', function () {
 })->middleware('auth')->name('dashboard');
 
 // UFO Report routes
-Route::get('/meld', [UfoReportController::class, 'create'])->name('reports.create');
+Route::get('/meld', [UfoReportController::class, 'create'])->middleware('auth')->name('reports.create');
 Route::post('/meld', [UfoReportController::class, 'store'])->name('reports.store');
 
 // Thank you page
@@ -31,6 +32,11 @@ Route::get('/over-ons', function () {
 // Authenticated routes
 Route::middleware('auth')->group(function () {
     Route::get('/mijn-meldingen', [UfoReportController::class, 'myReports'])->name('reports.my-reports');
+    
+    // Profile routes (required by Laravel Breeze)
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 // Authentication routes (Laravel Breeze)
