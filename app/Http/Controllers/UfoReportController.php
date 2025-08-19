@@ -23,18 +23,26 @@ class UfoReportController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-    'incident_datetime' => 'required',
-    'location' => 'required|string|max:255',
-    'description' => 'required|string|min:10',  // Reduced from 50 to 10
-    'category' => 'required|in:licht,object,ontmoeting,geluid,anders',
-    'photo' => 'nullable',  // Simplified
-    'reporter_name' => 'required|string|max:255',  // Simplified
-    'reporter_email' => 'required|email',  // Simplified
-]);
+        // Dynamic validation based on auth state
+        $rules = [
+            'incident_datetime' => 'required',
+            'location' => 'required|string|max:255',
+            'description' => 'required|string|min:10',
+            'category' => 'required|in:licht,object,ontmoeting,geluid,anders',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ];
+
+        // Add guest fields validation only if user is not logged in
+        if (!auth()->check()) {
+            $rules['reporter_name'] = 'required|string|max:255';
+            $rules['reporter_email'] = 'required|email';
+        }
+
+        $validated = $request->validate($rules);
 
         $report = new UfoReport();
         
+        // Set user info based on auth state
         if (auth()->check()) {
             $report->user_id = auth()->id();
         } else {
@@ -47,20 +55,21 @@ class UfoReportController extends Controller
         $report->description = $validated['description'];
         $report->category = $validated['category'];
 
+        // Handle photo upload
         if ($request->hasFile('photo')) {
             $path = $request->file('photo')->store('ufo-photos', 'public');
             $report->photo_path = $path;
         }
 
-$report->save();
+        // Save report (only once!)
+        $report->save();
 
-// Send email notifications (commented out for now to avoid mail errors)
-// $this->sendNotifications($report);
+        // Send email notifications (commented out for now)
+        // $this->sendNotifications($report);
 
-$report->save();
-
-// Debug - see if this shows
-return "Report saved with ID: " . $report->id . ". <a href='/bedankt/" . $report->id . "'>Go to thank you page</a>";
+        // Proper redirect to thank you page
+        return redirect()->route('reports.thanks', ['id' => $report->id])
+            ->with('success', 'Uw UFO-melding is succesvol ingediend!');
     }
 
     public function thanks(UfoReport $report)

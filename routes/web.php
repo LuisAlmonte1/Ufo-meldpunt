@@ -3,14 +3,15 @@
 use App\Http\Controllers\UfoReportController;
 use Illuminate\Support\Facades\Route;
 
-// Homepage - THIS IS CRITICAL
+// Homepage
 Route::get('/', function () {
     return view('home');
-    // Dashboard route (for after registration/login)
+})->name('home');
+
+// Dashboard route (for after registration/login redirects)
 Route::get('/dashboard', function () {
-    return redirect('/');
+    return redirect('/')->with('success', 'Welkom bij UFO Meldpunt Nederland!');
 })->middleware('auth')->name('dashboard');
-});
 
 // UFO Report routes
 Route::get('/meld', [UfoReportController::class, 'create'])->name('reports.create');
