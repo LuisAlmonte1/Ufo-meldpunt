@@ -18,7 +18,9 @@ class UfoReportController extends Controller
 
     public function create()
     {
-        return view('reports.create');
+        return view('reports.create', [
+            'user' => auth()->user()
+        ]);
     }
 
     public function store(Request $request)
