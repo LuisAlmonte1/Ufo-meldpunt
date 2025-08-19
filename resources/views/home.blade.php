@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
-    <!-- Navigation -->
+<!-- Navigation -->
     <nav class="bg-black/50 backdrop-blur-sm border-b border-green-500/30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -21,12 +21,25 @@
                     <div class="ml-10 flex items-baseline space-x-4">
                         <a href="/" class="text-gray-300 hover:text-green-400 px-3 py-2 rounded-md text-sm font-medium">Home</a>
                         <a href="/meld" class="text-gray-300 hover:text-green-400 px-3 py-2 rounded-md text-sm font-medium">Meld UFO</a>
+                        @auth
+                            <a href="/mijn-meldingen" class="text-gray-300 hover:text-green-400 px-3 py-2 rounded-md text-sm font-medium">Mijn Meldingen</a>
+                        @endauth
                         <a href="/over-ons" class="text-gray-300 hover:text-green-400 px-3 py-2 rounded-md text-sm font-medium">Over Ons</a>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="/login" class="text-gray-300 hover:text-green-400 px-3 py-2 rounded-md text-sm font-medium">Inloggen</a>
-                    <a href="/register" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md text-sm font-medium">Registreren</a>
+                    @guest
+                        <a href="/login" class="text-gray-300 hover:text-green-400 px-3 py-2 rounded-md text-sm font-medium">Inloggen</a>
+                        <a href="/register" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md text-sm font-medium">Registreren</a>
+                    @else
+                        <div class="relative flex items-center space-x-4">
+                            <span class="text-gray-300">Welkom, {{ auth()->user()->name }}</span>
+                            <form method="POST" action="/logout" class="inline">
+                                @csrf
+                                <button type="submit" class="text-red-400 hover:text-red-300 px-3 py-2 rounded-md text-sm font-medium">Uitloggen</button>
+                            </form>
+                        </div>
+                    @endguest
                 </div>
             </div>
         </div>
